@@ -1,0 +1,60 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: support-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - support-network
+
+  support-service:
+    build: ./support-service
+    container_name: support-service
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    networks:
+      - support-network
+
+  message-service:
+    build: ./message-service
+    container_name: message-service
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    networks:
+      - support-network
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: 3003
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    networks:
+      - support-network
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  support-network:
+    driver: bridge
