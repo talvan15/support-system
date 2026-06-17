@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suporte ao Cliente</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>Sistema de Suporte</h1>
+            <p>Atendimento em tempo real</p>
+        </div>
+
+        <div class="chat-container">
+
+            <div class="form-container">
+
+                <input
+                    type="number"
+                    id="sessaoId"
+                    placeholder="ID da Sessão">
+
+                <input
+                    type="text"
+                    id="cliente"
+                    placeholder="Nome do Cliente">
+
+                <textarea
+                    id="mensagem"
+                    placeholder="Digite sua mensagem"></textarea>
+
+                <button onclick="enviarMensagem()">
+                    Enviar Mensagem
+                </button>
+
+            </div>
+
+            <div class="historico-container">
+
+                <h2>Histórico de Conversas</h2>
+
+                <div id="historico">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
