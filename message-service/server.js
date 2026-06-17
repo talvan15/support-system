@@ -93,22 +93,34 @@ async function consumirMensagens() {
         const canal =
             await conexao.createChannel();
 
-        const fila =
-            "mensagens_suporte";
-
-        await canal.assertQueue(
-            fila,
+        await canal.assertExchange(
+            "support.exchange",
+            "fanout",
             {
                 durable: true
             }
         );
 
+        const fila =
+            await canal.assertQueue(
+                "",
+                {
+                    exclusive: true
+                }
+            );
+
+        await canal.bindQueue(
+            fila.queue,
+            "support.exchange",
+            ""
+        );
+
         console.log(
-            "Aguardando mensagens da fila..."
+            "Aguardando mensagens da exchange..."
         );
 
         canal.consume(
-            fila,
+            fila.queue,
             (msg) => {
 
                 if (!msg) return;
@@ -137,12 +149,29 @@ async function consumirMensagens() {
                         VALUES (?, ?, ?, ?)
                         `,
                         [
-                            dados.sessaoId,
-                            dados.cliente,
-                            dados.mensagem,
-                            dados.data ||
+                            dados.sessionId,
+                            dados.customer,
+                            dados.message,
+                            dados.createdAt ||
                             new Date().toISOString()
-                        ]
+                        ],
+                        (erro) => {
+
+                            if (erro) {
+
+                                console.error(
+                                    "Erro ao salvar no SQLite:",
+                                    erro
+                                );
+
+                                return;
+                            }
+
+                            console.log(
+                                "Mensagem salva no SQLite!"
+                            );
+
+                        }
                     );
 
                     canal.ack(msg);
@@ -170,7 +199,8 @@ async function consumirMensagens() {
 
 }
 
-const PORT = process.env.PORT || 3002;
+const PORT =
+    process.env.PORT || 3002;
 
 app.listen(PORT, () => {
 

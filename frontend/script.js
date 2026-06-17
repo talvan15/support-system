@@ -1,41 +1,24 @@
-const API_URL =
+const SUPPORT_API =
+    "http://localhost:3001";
+
+const MESSAGE_API =
     "http://localhost:3002";
 
-async function enviarMensagem() {
+const NOTIFICATION_API =
+    "http://localhost:3003";
 
-    const sessaoId =
-        document.getElementById(
-            "sessaoId"
-        ).value;
-
-    const cliente =
-        document.getElementById(
-            "cliente"
-        ).value;
-
-    const mensagem =
-        document.getElementById(
-            "mensagem"
-        ).value;
-
-    if (
-        !sessaoId ||
-        !cliente ||
-        !mensagem
-    ) {
-
-        alert(
-            "Preencha todos os campos."
-        );
-
-        return;
-    }
+async function criarSessao() {
 
     try {
 
-        const resposta =
+        const cliente =
+            document.getElementById(
+                "cliente"
+            ).value;
+
+        const response =
             await fetch(
-                `${API_URL}/mensagens`,
+                `${SUPPORT_API}/sessions`,
                 {
                     method: "POST",
 
@@ -45,50 +28,94 @@ async function enviarMensagem() {
                     },
 
                     body: JSON.stringify({
-                        sessaoId,
-                        cliente,
-                        mensagem
+                        customer: cliente
                     })
                 }
             );
 
-        if (!resposta.ok) {
-            throw new Error(
-                "Erro ao enviar mensagem"
-            );
-        }
+        const data =
+            await response.json();
 
         document.getElementById(
-            "mensagem"
-        ).value = "";
+            "sessaoId"
+        ).value =
+        data.id;
 
-        carregarMensagens();
+        alert(
+            `Sessão ${data.id} criada com sucesso`
+        );
 
     } catch (erro) {
 
-        alert(
-            "Erro ao enviar mensagem"
-        );
-
-        console.error(
-            erro
-        );
+        console.error(erro);
 
     }
 
 }
 
-async function carregarMensagens() {
+async function enviarMensagem() {
 
     try {
 
-        const resposta =
+        const sessionId =
+            document.getElementById(
+                "sessaoId"
+            ).value;
+
+        const customer =
+            document.getElementById(
+                "cliente"
+            ).value;
+
+        const message =
+            document.getElementById(
+                "mensagem"
+            ).value;
+
+        await fetch(
+            `${SUPPORT_API}/messages`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body: JSON.stringify({
+                    sessionId,
+                    customer,
+                    message
+                })
+            }
+        );
+
+        document.getElementById(
+            "mensagem"
+        ).value = "";
+
+        carregarHistorico();
+        buscarNotificacoes();
+
+    } catch (erro) {
+
+        console.error(erro);
+
+    }
+
+}
+
+async function carregarHistorico() {
+
+    try {
+
+        const response =
             await fetch(
-                `${API_URL}/mensagens`
+                `${MESSAGE_API}/mensagens`
             );
 
         const mensagens =
-            await resposta.json();
+            await response.json();
 
         const historico =
             document.getElementById(
@@ -97,21 +124,8 @@ async function carregarMensagens() {
 
         historico.innerHTML = "";
 
-        if (
-            mensagens.length === 0
-        ) {
-
-            historico.innerHTML = `
-                <p class="sem-mensagens">
-                    Nenhuma mensagem encontrada
-                </p>
-            `;
-
-            return;
-        }
-
-        mensagens.forEach(
-            (msg) => {
+        mensagens.reverse().forEach(
+            msg => {
 
                 historico.innerHTML += `
                     <div class="card">
@@ -137,17 +151,68 @@ async function carregarMensagens() {
 
     } catch (erro) {
 
-        console.error(
-            erro
-        );
+        console.error(erro);
 
     }
 
 }
 
-carregarMensagens();
+async function buscarNotificacoes() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${NOTIFICATION_API}/notifications`
+            );
+
+        const notificacoes =
+            await response.json();
+
+        const container =
+            document.getElementById(
+                "notificacoes"
+            );
+
+        container.innerHTML = "";
+
+        notificacoes.reverse().forEach(
+            item => {
+
+                container.innerHTML += `
+                    <div class="notificacao">
+
+                        <strong>
+                            ${item.customer}
+                        </strong>
+
+                        <p>
+                            ${item.message}
+                        </p>
+
+                    </div>
+                `;
+
+            }
+        );
+
+    } catch (erro) {
+
+        console.error(erro);
+
+    }
+
+}
+
+carregarHistorico();
+buscarNotificacoes();
 
 setInterval(
-    carregarMensagens,
+    carregarHistorico,
+    3000
+);
+
+setInterval(
+    buscarNotificacoes,
     3000
 );

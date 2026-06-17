@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suporte ao Cliente</title>
+    <title>Sistema de Suporte</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -23,18 +23,24 @@
             <div class="form-container">
 
                 <input
-                    type="number"
-                    id="sessaoId"
-                    placeholder="ID da Sessão">
-
-                <input
                     type="text"
                     id="cliente"
                     placeholder="Nome do Cliente">
 
+                <button onclick="criarSessao()">
+                    Criar Sessão
+                </button>
+
+                <input
+                    type="number"
+                    id="sessaoId"
+                    placeholder="ID da Sessão"
+                    readonly>
+
                 <textarea
                     id="mensagem"
-                    placeholder="Digite sua mensagem"></textarea>
+                    placeholder="Digite sua mensagem">
+                </textarea>
 
                 <button onclick="enviarMensagem()">
                     Enviar Mensagem
@@ -44,13 +50,23 @@
 
             <div class="historico-container">
 
-                <h2>Histórico de Conversas</h2>
+                <h2>📨 Histórico de Conversas</h2>
 
-                <div id="historico">
-
-                </div>
+                <div id="historico"></div>
 
             </div>
+
+        </div>
+
+        <div class="notificacoes-container">
+
+            <h2>🔔 Notificações</h2>
+
+            <button onclick="buscarNotificacoes()">
+                Atualizar Notificações
+            </button>
+
+            <div id="notificacoes"></div>
 
         </div>
 
