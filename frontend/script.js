@@ -204,6 +204,19 @@ async function buscarNotificacoes() {
 
 }
 
+async function limparHistorico() {
+
+    await fetch(
+        "http://localhost:3002/mensagens",
+        {
+            method: "DELETE"
+        }
+    );
+
+    carregarHistorico();
+
+}
+
 carregarHistorico();
 buscarNotificacoes();
 
